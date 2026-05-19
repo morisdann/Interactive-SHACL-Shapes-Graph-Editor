@@ -1,0 +1,32 @@
+[
+  {
+    "id": "http://example.com/ns#PersonShape",
+    "targetClass": [
+      "http://example.com/ns#Person"
+    ],
+    "closed": true,
+    "ignoredProperties": [
+      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+    ],
+    "properties": [
+      {
+        "path": "http://example.com/ns#ssn",
+        "datatype": "http://www.w3.org/2001/XMLSchema#string",
+        "class": "",
+        "nodeKind": "",
+        "minCount": null,
+        "maxCount": 1,
+        "pattern": "^\\d{3}-\\d{2}-\\d{4}$"
+      },
+      {
+        "path": "http://example.com/ns#worksFor",
+        "datatype": "",
+        "class": "http://example.com/ns#Company",
+        "nodeKind": "http://www.w3.org/ns/shacl#IRI",
+        "minCount": null,
+        "maxCount": null,
+        "pattern": ""
+      }
+    ]
+  }
+]

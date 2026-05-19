@@ -3,3 +3,4 @@ rdflib-jsonld==0.6.2
 flask==2.3.0
 flask-cors==4.0.0
 json5==0.9.14
+pyshacl==0.31.0
