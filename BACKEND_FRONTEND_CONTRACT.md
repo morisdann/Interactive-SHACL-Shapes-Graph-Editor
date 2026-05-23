@@ -170,11 +170,16 @@ Content-Type: application/json
 
 **Response (200 OK)**
 ```json
-{
-  "shapes": [
-    { ...node in agreed format... },
-    { ...node in agreed format... }
-  ]
+
+ {
+  "tree": {
+    "id": "shape-1",
+    "type": "NodeShape",
+    "label": "PersonShape",
+    "properties": { "sh:targetClass": "ex:Person" },
+    "children": [...]
+  }
+
 }
 ```
 
