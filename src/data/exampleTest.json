@@ -1,30 +1,138 @@
 [
   {
-    "id": "http://example.com/ns#PersonShape",
+    "id": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#FullProfessorShape",
     "targetClass": [
-      "http://example.com/ns#Person"
+      "http://swat.cse.lehigh.edu/onto/univ-bench.owl#FullProfessor"
     ],
-    "closed": true,
-    "ignoredProperties": [
-      "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
-    ],
+    "closed": null,
+    "ignoredProperties": [],
     "properties": [
       {
-        "path": "http://example.com/ns#ssn",
-        "datatype": "http://www.w3.org/2001/XMLSchema#string",
+        "path": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#doctoralDegreeFrom",
+        "datatype": "",
+        "class": "",
+        "nodeKind": "",
+        "minCount": 1,
+        "maxCount": null,
+        "pattern": ""
+      },
+      {
+        "path": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#emailAddress",
+        "datatype": "",
+        "class": "",
+        "nodeKind": "",
+        "minCount": 1,
+        "maxCount": null,
+        "pattern": ""
+      },
+      {
+        "path": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#headOf",
+        "datatype": "",
         "class": "",
         "nodeKind": "",
         "minCount": null,
         "maxCount": 1,
-        "pattern": "^\\d{3}-\\d{2}-\\d{4}$"
+        "pattern": ""
       },
       {
-        "path": "http://example.com/ns#worksFor",
+        "path": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#mastersDegreeFrom",
         "datatype": "",
-        "class": "http://example.com/ns#Company",
-        "nodeKind": "http://www.w3.org/ns/shacl#IRI",
-        "minCount": null,
+        "class": "",
+        "nodeKind": "",
+        "minCount": 1,
         "maxCount": null,
+        "pattern": ""
+      },
+      {
+        "path": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#name",
+        "datatype": "",
+        "class": "",
+        "nodeKind": "",
+        "minCount": 1,
+        "maxCount": 1,
+        "pattern": ""
+      },
+      {
+        "path": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#researchInterest",
+        "datatype": "",
+        "class": "",
+        "nodeKind": "",
+        "minCount": 1,
+        "maxCount": null,
+        "pattern": ""
+      },
+      {
+        "path": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#telephone",
+        "datatype": "",
+        "class": "",
+        "nodeKind": "",
+        "minCount": 1,
+        "maxCount": null,
+        "pattern": ""
+      },
+      {
+        "path": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#undergraduateDegreeFrom",
+        "datatype": "",
+        "class": "",
+        "nodeKind": "",
+        "minCount": 1,
+        "maxCount": null,
+        "pattern": ""
+      },
+      {
+        "path": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#worksFor",
+        "datatype": "",
+        "class": "",
+        "nodeKind": "",
+        "minCount": 1,
+        "maxCount": null,
+        "pattern": ""
+      }
+    ]
+  },
+  {
+    "id": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#DepartmentShape",
+    "targetClass": [
+      "http://swat.cse.lehigh.edu/onto/univ-bench.owl#Department"
+    ],
+    "closed": null,
+    "ignoredProperties": [],
+    "properties": [
+      {
+        "path": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#name",
+        "datatype": "",
+        "class": "",
+        "nodeKind": "",
+        "minCount": 1,
+        "maxCount": 1,
+        "pattern": ""
+      },
+      {
+        "path": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#subOrganizationOf",
+        "datatype": "",
+        "class": "",
+        "nodeKind": "",
+        "minCount": 1,
+        "maxCount": 1,
+        "pattern": ""
+      }
+    ]
+  },
+  {
+    "id": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#UniversityShape",
+    "targetClass": [
+      "http://swat.cse.lehigh.edu/onto/univ-bench.owl#University"
+    ],
+    "closed": null,
+    "ignoredProperties": [],
+    "properties": [
+      {
+        "path": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#name",
+        "datatype": "",
+        "class": "",
+        "nodeKind": "",
+        "minCount": 1,
+        "maxCount": 1,
         "pattern": ""
       }
     ]

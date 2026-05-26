@@ -3,18 +3,21 @@ from pathlib import Path
 
 from rdflib import Graph
 import json
-from shacl_parser import parse_shacl
+from shacl_parser import parse_shacl, parse_json #roundtrip_test
 
 
 BASE_DIR = Path(__file__).resolve().parent
 output_path = BASE_DIR / "data" / "exampleTest.json"
 # Load the SHACL file
 graph = Graph()
-graph.parse("src/data/exampleTest.ttl", format="turtle")
-#jsonld = graph.serialize(format="json-ld", indent=2)
+graph.parse("src/data/schema1.ttl", format="turtle")
+
 jsonld = parse_shacl(graph)
 
 
 
+with open(BASE_DIR / "data" / "exampleTest.json", 'r', encoding='utf-8') as f:
+        shapes_data = json.load(f)
 
-print(jsonld)
+shapes_data =parse_json(shapes_data, "data/output.ttl")
+#roundtrip_test(shapes_data, "data/output.ttl")

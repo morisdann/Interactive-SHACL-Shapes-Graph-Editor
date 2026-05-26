@@ -1,0 +1,41 @@
+@prefix lehigh: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+lehigh:DepartmentShape a sh:NodeShape ;
+    sh:property [ sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path lehigh:subOrganizationOf ],
+        [ sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path lehigh:name ] ;
+    sh:targetClass lehigh:Department .
+
+lehigh:FullProfessorShape a sh:NodeShape ;
+    sh:property [ sh:minCount 1 ;
+            sh:path lehigh:emailAddress ],
+        [ sh:minCount 1 ;
+            sh:path lehigh:mastersDegreeFrom ],
+        [ sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path lehigh:name ],
+        [ sh:minCount 1 ;
+            sh:path lehigh:doctoralDegreeFrom ],
+        [ sh:minCount 1 ;
+            sh:path lehigh:telephone ],
+        [ sh:minCount 1 ;
+            sh:path lehigh:undergraduateDegreeFrom ],
+        [ sh:maxCount 1 ;
+            sh:path lehigh:headOf ],
+        [ sh:minCount 1 ;
+            sh:path lehigh:researchInterest ],
+        [ sh:minCount 1 ;
+            sh:path lehigh:worksFor ] ;
+    sh:targetClass lehigh:FullProfessor .
+
+lehigh:UniversityShape a sh:NodeShape ;
+    sh:property [ sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path lehigh:name ] ;
+    sh:targetClass lehigh:University .
+
