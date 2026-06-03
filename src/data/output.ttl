@@ -1,41 +1,47 @@
-@prefix lehigh: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-lehigh:DepartmentShape a sh:NodeShape ;
-    sh:property [ sh:maxCount 1 ;
-            sh:minCount 1 ;
-            sh:path lehigh:subOrganizationOf ],
-        [ sh:maxCount 1 ;
-            sh:minCount 1 ;
-            sh:path lehigh:name ] ;
-    sh:targetClass lehigh:Department .
-
-lehigh:FullProfessorShape a sh:NodeShape ;
+ub:FullProfessorShape a sh:NodeShape ;
     sh:property [ sh:minCount 1 ;
-            sh:path lehigh:emailAddress ],
+            sh:node ub:UniversityShape ;
+            sh:path ub:mastersDegreeFrom ],
+        [ sh:maxCount 1 ;
+            sh:node ub:DepartmentShape ;
+            sh:path ub:headOf ],
         [ sh:minCount 1 ;
-            sh:path lehigh:mastersDegreeFrom ],
+            sh:path ub:researchInterest ],
         [ sh:maxCount 1 ;
             sh:minCount 1 ;
-            sh:path lehigh:name ],
+            sh:path ub:name ],
         [ sh:minCount 1 ;
-            sh:path lehigh:doctoralDegreeFrom ],
+            sh:path ub:telephone ],
         [ sh:minCount 1 ;
-            sh:path lehigh:telephone ],
+            sh:node ub:UniversityShape ;
+            sh:path ub:undergraduateDegreeFrom ],
         [ sh:minCount 1 ;
-            sh:path lehigh:undergraduateDegreeFrom ],
-        [ sh:maxCount 1 ;
-            sh:path lehigh:headOf ],
+            sh:path ub:emailAddress ],
         [ sh:minCount 1 ;
-            sh:path lehigh:researchInterest ],
+            sh:node ub:DepartmentShape ;
+            sh:path ub:worksFor ],
         [ sh:minCount 1 ;
-            sh:path lehigh:worksFor ] ;
-    sh:targetClass lehigh:FullProfessor .
+            sh:node ub:UniversityShape ;
+            sh:path ub:doctoralDegreeFrom ] ;
+    sh:targetClass ub:FullProfessor .
 
-lehigh:UniversityShape a sh:NodeShape ;
+ub:DepartmentShape a sh:NodeShape ;
     sh:property [ sh:maxCount 1 ;
             sh:minCount 1 ;
-            sh:path lehigh:name ] ;
-    sh:targetClass lehigh:University .
+            sh:path ub:name ],
+        [ sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:node ub:UniversityShape ;
+            sh:path ub:subOrganizationOf ] ;
+    sh:targetClass ub:Department .
+
+ub:UniversityShape a sh:NodeShape ;
+    sh:property [ sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path ub:name ] ;
+    sh:targetClass ub:University .
 

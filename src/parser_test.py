@@ -18,6 +18,8 @@ jsonld = parse_shacl(graph)
 
 with open(BASE_DIR / "data" / "exampleTest.json", 'r', encoding='utf-8') as f:
         shapes_data = json.load(f)
+parse_json(shapes_data, "data/output.ttl")
 
-shapes_data =parse_json(shapes_data, "data/output.ttl")
-#roundtrip_test(shapes_data, "data/output.ttl")
+graph2 = Graph()
+graph2.parse("src/data/output.ttl", format="turtle")
+print(graph.isomorphic(graph2))
