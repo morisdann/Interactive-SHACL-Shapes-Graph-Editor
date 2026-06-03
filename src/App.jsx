@@ -209,7 +209,7 @@ function ShapeNode({ data, selected }) {
   const style = typeStyles[data.type] || { bg: "#f5f5f5", border: "#aaa" }
   
   const [isEditing, setEditing] = useState(false)
-  const propertyKey = Object.keys(data.properties)[0]
+  const propertyKey = Object.keys(data.properties).find(k => k !== "rdf:about") || Object.keys(data.properties)[0]
 
   const [editValue, setEditValue] = useState("")
 
@@ -506,7 +506,7 @@ function App() {
 
   const [selectedNodeId, setSelectedNodeId] = useState(null)
   const [clipboard, setClipboard] = useState(null)
-
+   const [allTrees, setAllTrees] = useState([])
 
   const { nodes: layoutedNodes, edges: layoutedEdges } = convertTreeToFlow(treeData)
 const flowNodes = layoutedNodes.map(n => ({ ...n, type: "shapeNode", selected: n.id === selectedNodeId, key: n.id, data: {
@@ -612,34 +612,48 @@ function handleDrop(draggedId, targetId) {
 }
 
   async function handleImport(turtleText) {
-  // For now, until the backend be ready
-  console.log("Turtle received:", turtleText)
+   const response = await fetch("/api/parse", {
+    method: "POST",
 
-  // const response = await fetch("/api/parse", {
-  //   method: "POST",
-  //   headers: { "Content-Type": "application/json" },
-  //   body: JSON.stringify({ turtle: turtleText })
-  // })
-  // const data = await response.json()
-  // setTreeData(data.tree)
+      headers: { "Content-Type": "application/json" },
+
+
+    body: JSON.stringify({ turtle: turtleText })
+  })
+  const data = await response.json()
+  if (data.trees) {
+    setAllTrees(data.trees)
+     setTreeData(data.trees[0])
+  } else {
+     setAllTrees([data.tree])
+      setTreeData(data.tree)
+  }
 }
 
 async function handleExport() {
-  console.log("tree:", treeData)
 
-  // const response = await fetch("/api/serialize", {
-  //   method: "POST",
-  //   headers: { "Content-Type": "application/json" },
-  //   body: JSON.stringify({ tree: treeData })
-  // })
-  // const data = await response.json()
-  // const blob = new Blob([data.turtle], { type: "text/turtle" })
-  // const url = URL.createObjectURL(blob)
-  // const a = document.createElement("a")
-  // a.href = url
-  // a.download = "shapes.ttl"
-  // a.click()
-  // URL.revokeObjectURL(url)
+  const response = await fetch("/api/serialize", {
+     method: "POST",
+
+    headers: { "Content-Type": "application/json" },
+
+    body: JSON.stringify({ tree: treeData })
+   } )
+  const data = await response.json()
+
+   const blob = new Blob([data.turtle], { type: "text/turtle" })
+
+   const url = URL.createObjectURL(blob)
+
+   const a = document.createElement("a")
+
+   a.href = url
+
+   a.download = "shapes.ttl"
+
+
+   a.click()
+   URL.revokeObjectURL(url)
 }
 
 
@@ -706,6 +720,27 @@ function handlePaste() {
     <p style={{ margin: "2px 0 0", fontSize: "12px", color: "#888" }}>
       Double-click a node to edit · Drag to move or reorder · Right panel for actions
     </p>
+    { allTrees.length > 1 && (
+  <select
+    onChange={e => {
+      setTreeData(allTrees[Number(e.target.value)])
+      setSelectedNodeId(null)
+    } } 
+    style={{
+      marginTop: "6px",
+      padding: "5px 10px",
+      borderRadius: "6px",
+      border: "1.5px solid #cdd",
+      fontSize: "13px",
+      cursor: "pointer",
+    } }
+  >
+    {allTrees.map((t, i) => (
+      <option key={i} value={i}>{t.label}</option>
+    ) ) }
+  </select>
+)}
+
   </div>
   <button onClick={handleExport} style={{ padding: "8px 18px", background: "#1a1a2e", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontSize: "13px", fontWeight: 600 }}>
     Export Turtle
