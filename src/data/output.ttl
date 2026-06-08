@@ -5,25 +5,25 @@
 ub:FullProfessorShape a sh:NodeShape ;
     sh:property [ sh:minCount 1 ;
             sh:node ub:UniversityShape ;
-            sh:path ub:mastersDegreeFrom ],
+            sh:path ub:undergraduateDegreeFrom ],
+        [ sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path ub:name ],
         [ sh:maxCount 1 ;
             sh:node ub:DepartmentShape ;
             sh:path ub:headOf ],
         [ sh:minCount 1 ;
-            sh:path ub:researchInterest ],
-        [ sh:maxCount 1 ;
-            sh:minCount 1 ;
-            sh:path ub:name ],
-        [ sh:minCount 1 ;
-            sh:path ub:telephone ],
+            sh:node ub:DepartmentShape ;
+            sh:path ub:worksFor ],
         [ sh:minCount 1 ;
             sh:node ub:UniversityShape ;
-            sh:path ub:undergraduateDegreeFrom ],
+            sh:path ub:mastersDegreeFrom ],
+        [ sh:minCount 1 ;
+            sh:path ub:researchInterest ],
         [ sh:minCount 1 ;
             sh:path ub:emailAddress ],
         [ sh:minCount 1 ;
-            sh:node ub:DepartmentShape ;
-            sh:path ub:worksFor ],
+            sh:path ub:telephone ],
         [ sh:minCount 1 ;
             sh:node ub:UniversityShape ;
             sh:path ub:doctoralDegreeFrom ] ;
@@ -32,11 +32,11 @@ ub:FullProfessorShape a sh:NodeShape ;
 ub:DepartmentShape a sh:NodeShape ;
     sh:property [ sh:maxCount 1 ;
             sh:minCount 1 ;
-            sh:path ub:name ],
+            sh:node ub:UniversityShape ;
+            sh:path ub:subOrganizationOf ],
         [ sh:maxCount 1 ;
             sh:minCount 1 ;
-            sh:node ub:UniversityShape ;
-            sh:path ub:subOrganizationOf ] ;
+            sh:path ub:name ] ;
     sh:targetClass ub:Department .
 
 ub:UniversityShape a sh:NodeShape ;
