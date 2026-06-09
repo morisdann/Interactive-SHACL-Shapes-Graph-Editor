@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@comake/shacl-to-json-schema": "^1.0.3"
+  }
+}

@@ -1,0 +1,47 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ub: <http://swat.cse.lehigh.edu/onto/univ-bench.owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ub:FullProfessorShape a sh:NodeShape ;
+    sh:property [ sh:minCount 1 ;
+            sh:node ub:UniversityShape ;
+            sh:path ub:mastersDegreeFrom ],
+        [ sh:maxCount 1 ;
+            sh:node ub:DepartmentShape ;
+            sh:path ub:headOf ],
+        [ sh:minCount 1 ;
+            sh:path ub:emailAddress ],
+        [ sh:minCount 1 ;
+            sh:node ub:UniversityShape ;
+            sh:path ub:doctoralDegreeFrom ],
+        [ sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path ub:name ],
+        [ sh:minCount 1 ;
+            sh:node ub:DepartmentShape ;
+            sh:path ub:worksFor ],
+        [ sh:minCount 1 ;
+            sh:node ub:UniversityShape ;
+            sh:path ub:undergraduateDegreeFrom ],
+        [ sh:minCount 1 ;
+            sh:path ub:researchInterest ],
+        [ sh:minCount 1 ;
+            sh:path ub:telephone ] ;
+    sh:targetClass ub:FullProfessor .
+
+ub:DepartmentShape a sh:NodeShape ;
+    sh:property [ sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path ub:name ],
+        [ sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:node ub:UniversityShape ;
+            sh:path ub:subOrganizationOf ] ;
+    sh:targetClass ub:Department .
+
+ub:UniversityShape a sh:NodeShape ;
+    sh:property [ sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path ub:name ] ;
+    sh:targetClass ub:University .
+
