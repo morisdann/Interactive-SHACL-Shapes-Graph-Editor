@@ -170,7 +170,8 @@ Content-Type: application/json
 
 **Response (200 OK)**
 ```json
-{
+
+ {
   "tree": {
     "id": "shape-1",
     "type": "NodeShape",
@@ -178,6 +179,7 @@ Content-Type: application/json
     "properties": { "sh:targetClass": "ex:Person" },
     "children": [...]
   }
+
 }
 ```
 

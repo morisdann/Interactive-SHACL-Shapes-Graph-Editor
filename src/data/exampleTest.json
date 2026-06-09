@@ -1,0 +1,362 @@
+{
+  "namespaces": {
+    "sh": "http://www.w3.org/ns/shacl#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "ub": "http://swat.cse.lehigh.edu/onto/univ-bench.owl#"
+  },
+  "trees": [
+    {
+      "id": "shape-1",
+      "type": "NodeShape",
+      "label": "FullProfessorShape",
+      "properties": {
+        "rdf:about": "ub:FullProfessorShape",
+        "sh:targetClass": "ub:FullProfessor"
+      },
+      "children": [
+        {
+          "id": "prop-1",
+          "type": "PropertyShape",
+          "label": "doctoralDegreeFrom property",
+          "properties": {
+            "sh:path": "ub:doctoralDegreeFrom"
+          },
+          "children": [
+            {
+              "id": "constraint-1",
+              "type": "Constraint",
+              "label": "minCount = 1",
+              "properties": {
+                "sh:minCount": 1
+              },
+              "children": []
+            },
+            {
+              "id": "constraint-2",
+              "type": "Constraint",
+              "label": "node = ub:UniversityShape",
+              "properties": {
+                "sh:node": "ub:UniversityShape"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "prop-2",
+          "type": "PropertyShape",
+          "label": "emailAddress property",
+          "properties": {
+            "sh:path": "ub:emailAddress"
+          },
+          "children": [
+            {
+              "id": "constraint-3",
+              "type": "Constraint",
+              "label": "minCount = 1",
+              "properties": {
+                "sh:minCount": 1
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "prop-3",
+          "type": "PropertyShape",
+          "label": "headOf property",
+          "properties": {
+            "sh:path": "ub:headOf"
+          },
+          "children": [
+            {
+              "id": "constraint-4",
+              "type": "Constraint",
+              "label": "maxCount = 1",
+              "properties": {
+                "sh:maxCount": 1
+              },
+              "children": []
+            },
+            {
+              "id": "constraint-5",
+              "type": "Constraint",
+              "label": "node = ub:DepartmentShape",
+              "properties": {
+                "sh:node": "ub:DepartmentShape"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "prop-4",
+          "type": "PropertyShape",
+          "label": "mastersDegreeFrom property",
+          "properties": {
+            "sh:path": "ub:mastersDegreeFrom"
+          },
+          "children": [
+            {
+              "id": "constraint-6",
+              "type": "Constraint",
+              "label": "minCount = 1",
+              "properties": {
+                "sh:minCount": 1
+              },
+              "children": []
+            },
+            {
+              "id": "constraint-7",
+              "type": "Constraint",
+              "label": "node = ub:UniversityShape",
+              "properties": {
+                "sh:node": "ub:UniversityShape"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "prop-5",
+          "type": "PropertyShape",
+          "label": "name property",
+          "properties": {
+            "sh:path": "ub:name"
+          },
+          "children": [
+            {
+              "id": "constraint-8",
+              "type": "Constraint",
+              "label": "minCount = 1",
+              "properties": {
+                "sh:minCount": 1
+              },
+              "children": []
+            },
+            {
+              "id": "constraint-9",
+              "type": "Constraint",
+              "label": "maxCount = 1",
+              "properties": {
+                "sh:maxCount": 1
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "prop-6",
+          "type": "PropertyShape",
+          "label": "researchInterest property",
+          "properties": {
+            "sh:path": "ub:researchInterest"
+          },
+          "children": [
+            {
+              "id": "constraint-10",
+              "type": "Constraint",
+              "label": "minCount = 1",
+              "properties": {
+                "sh:minCount": 1
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "prop-7",
+          "type": "PropertyShape",
+          "label": "telephone property",
+          "properties": {
+            "sh:path": "ub:telephone"
+          },
+          "children": [
+            {
+              "id": "constraint-11",
+              "type": "Constraint",
+              "label": "minCount = 1",
+              "properties": {
+                "sh:minCount": 1
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "prop-8",
+          "type": "PropertyShape",
+          "label": "undergraduateDegreeFrom property",
+          "properties": {
+            "sh:path": "ub:undergraduateDegreeFrom"
+          },
+          "children": [
+            {
+              "id": "constraint-12",
+              "type": "Constraint",
+              "label": "minCount = 1",
+              "properties": {
+                "sh:minCount": 1
+              },
+              "children": []
+            },
+            {
+              "id": "constraint-13",
+              "type": "Constraint",
+              "label": "node = ub:UniversityShape",
+              "properties": {
+                "sh:node": "ub:UniversityShape"
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "prop-9",
+          "type": "PropertyShape",
+          "label": "worksFor property",
+          "properties": {
+            "sh:path": "ub:worksFor"
+          },
+          "children": [
+            {
+              "id": "constraint-14",
+              "type": "Constraint",
+              "label": "minCount = 1",
+              "properties": {
+                "sh:minCount": 1
+              },
+              "children": []
+            },
+            {
+              "id": "constraint-15",
+              "type": "Constraint",
+              "label": "node = ub:DepartmentShape",
+              "properties": {
+                "sh:node": "ub:DepartmentShape"
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shape-2",
+      "type": "NodeShape",
+      "label": "DepartmentShape",
+      "properties": {
+        "rdf:about": "ub:DepartmentShape",
+        "sh:targetClass": "ub:Department"
+      },
+      "children": [
+        {
+          "id": "prop-10",
+          "type": "PropertyShape",
+          "label": "name property",
+          "properties": {
+            "sh:path": "ub:name"
+          },
+          "children": [
+            {
+              "id": "constraint-16",
+              "type": "Constraint",
+              "label": "minCount = 1",
+              "properties": {
+                "sh:minCount": 1
+              },
+              "children": []
+            },
+            {
+              "id": "constraint-17",
+              "type": "Constraint",
+              "label": "maxCount = 1",
+              "properties": {
+                "sh:maxCount": 1
+              },
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "prop-11",
+          "type": "PropertyShape",
+          "label": "subOrganizationOf property",
+          "properties": {
+            "sh:path": "ub:subOrganizationOf"
+          },
+          "children": [
+            {
+              "id": "constraint-18",
+              "type": "Constraint",
+              "label": "minCount = 1",
+              "properties": {
+                "sh:minCount": 1
+              },
+              "children": []
+            },
+            {
+              "id": "constraint-19",
+              "type": "Constraint",
+              "label": "maxCount = 1",
+              "properties": {
+                "sh:maxCount": 1
+              },
+              "children": []
+            },
+            {
+              "id": "constraint-20",
+              "type": "Constraint",
+              "label": "node = ub:UniversityShape",
+              "properties": {
+                "sh:node": "ub:UniversityShape"
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shape-3",
+      "type": "NodeShape",
+      "label": "UniversityShape",
+      "properties": {
+        "rdf:about": "ub:UniversityShape",
+        "sh:targetClass": "ub:University"
+      },
+      "children": [
+        {
+          "id": "prop-12",
+          "type": "PropertyShape",
+          "label": "name property",
+          "properties": {
+            "sh:path": "ub:name"
+          },
+          "children": [
+            {
+              "id": "constraint-21",
+              "type": "Constraint",
+              "label": "minCount = 1",
+              "properties": {
+                "sh:minCount": 1
+              },
+              "children": []
+            },
+            {
+              "id": "constraint-22",
+              "type": "Constraint",
+              "label": "maxCount = 1",
+              "properties": {
+                "sh:maxCount": 1
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

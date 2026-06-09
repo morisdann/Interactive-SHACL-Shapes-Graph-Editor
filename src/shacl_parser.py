@@ -1,272 +1,464 @@
 import json
-from rdflib import Graph, Namespace, RDF, RDFS, URIRef
+from pathlib import Path
+from urllib.parse import urlparse
 
-# Define namespaces
-SH = Namespace("http://www.w3.org/ns/shacl#")
-EX = Namespace("http://example.org/")
+from rdflib import XSD, BNode, Graph, RDF, Literal, Namespace, URIRef
+from rdflib.namespace import SH
 
 
-def extract_shape(graph, shape_iri):
+BASE_DIR = Path(__file__).resolve().parent
+output_path_json = BASE_DIR / "data" / "exampleTest.json"
+output_path_shacl = BASE_DIR/ "data" / "exampleTestShacl.ttl"
+
+# Standard well-known namespaces
+STANDARD_NAMESPACES = {
+    "http://www.w3.org/2001/XMLSchema#": "xsd",
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#": "rdf",
+    "http://www.w3.org/2000/01/rdf-schema#": "rdfs",
+    "http://www.w3.org/ns/shacl#": "sh",
+    "http://example.com/ns#": "ex"
+}
+
+
+
+from rdflib import RDF
+from rdflib.namespace import SH
+
+
+def local_name(value):
+    value = str(value)
+
+    if "#" in value:
+        return value.rsplit("#", 1)[1]
+
+    if "/" in value:
+        return value.rstrip("/").rsplit("/", 1)[1]
+
+    return value
+
+
+def shorten_uri(graph, value):
     """
-    Extract a single shape and all its properties from the RDF graph.
+    Convert full URI to prefixed form if possible.
+    Example:
+    http://example.com/ns#Person -> ex:Person
+    http://www.w3.org/ns/shacl#IRI -> sh:IRI
     """
-    
-    # Convert string to URIRef if needed
-    if isinstance(shape_iri, str):
-        try:
-            shape_iri = URIRef(shape_iri)
-        except Exception:
-            return None
-    
-    shape = {
-        'id': str(shape_iri),
-        'name': get_single_value(graph, shape_iri, RDFS.label),
-        'description': get_single_value(graph, shape_iri, RDFS.comment),
-        'targetClass': get_all_values(graph, shape_iri, SH.targetClass),
-        'targetNode': get_all_values(graph, shape_iri, SH.targetNode),
-        'properties': []
-    }
-    
-    # Extract all property shapes
-    property_shapes = list(graph.objects(shape_iri, SH.property))
-    
-    for prop_shape in property_shapes:
-        prop_data = extract_property_shape(graph, prop_shape)
-        if prop_data:
-            shape['properties'].append(prop_data)
-    
-    return shape
-
-
-def extract_all_shapes(graph):
-    """
-    Automatically find and extract all NodeShapes from the graph.
-    Discovers shapes from ANY namespace, not just predefined ones.
-    """
-    all_shapes = []
-    
-    # Find all IRIs for shapes by querying for rdf:type sh:NodeShape
-    shape_iris = list(graph.subjects(RDF.type, SH.NodeShape))
-    
-    print(f"Found {len(shape_iris)} shapes in the document")
-    
-    for shape_iri in shape_iris:
-        shape = extract_shape(graph, shape_iri)
-        if shape:
-            all_shapes.append(shape)
-    
-    return all_shapes
-
-
-def extract_property_shape(graph, prop_shape_iri):
-    """
-    Extract a single property shape with all its constraints.
-    """
-    
     try:
-        prop = {
-            'id': str(prop_shape_iri),
-            'path': get_property_path(graph, prop_shape_iri),
-            'name': get_single_value(graph, prop_shape_iri, RDFS.label),
-            'description': get_single_value(graph, prop_shape_iri, RDFS.comment),
-            'constraints': {}
-        }
-        
-        # Extract common constraints
-        constraints = prop['constraints']
-        
-        # Data type constraint
-        datatype = get_single_value(graph, prop_shape_iri, SH.datatype)
-        if datatype:
-            constraints['datatype'] = datatype
-        
-        # Class constraint (use SH["class"] for reserved keyword)
-        sh_class = get_single_value(graph, prop_shape_iri, SH["class"])
-        if sh_class:
-            constraints['class'] = sh_class
-        
-        # Cardinality constraints
-        min_count = get_single_value(graph, prop_shape_iri, SH.minCount)
-        if min_count:
-            try:
-                constraints['minCount'] = int(min_count)
-            except ValueError:
-                pass
-        
-        max_count = get_single_value(graph, prop_shape_iri, SH.maxCount)
-        if max_count:
-            try:
-                constraints['maxCount'] = int(max_count)
-            except ValueError:
-                pass
-        
-        # String length constraints
-        min_length = get_single_value(graph, prop_shape_iri, SH.minLength)
-        if min_length:
-            try:
-                constraints['minLength'] = int(min_length)
-            except ValueError:
-                pass
-        
-        max_length = get_single_value(graph, prop_shape_iri, SH.maxLength)
-        if max_length:
-            try:
-                constraints['maxLength'] = int(max_length)
-            except ValueError:
-                pass
-        
-        # Pattern constraint (regex)
-        pattern = get_single_value(graph, prop_shape_iri, SH.pattern)
-        if pattern:
-            constraints['pattern'] = pattern
-        
-        # In constraint (use SH["in"] for reserved keyword)
-        in_values = get_rdf_list(graph, prop_shape_iri, SH["in"])
-        if in_values:
-            constraints['in'] = [str(v) for v in in_values]
-        
-        return prop
-    
-    except Exception as e:
-        print(f"Error extracting property shape {prop_shape_iri}: {e}")
-        return None
+        return graph.namespace_manager.normalizeUri(value)
+    except Exception:
+        return str(value)
 
 
-def get_property_path(graph, prop_shape_iri):
-    """
-    Extract the sh:path from a property shape.
-    Handles simple paths and sequences.
-    """
-    
-    path = graph.value(prop_shape_iri, SH.path)
-    
-    if not path:
-        return None
-    
-    # Check if it's an RDF list (sequence path)
-    first = graph.value(path, RDF.first)
-    if first:
-        # It's a list - extract all elements
-        path_sequence = get_rdf_list(graph, path)
-        return {
-            'type': 'sequence',
-            'paths': [str(p) for p in path_sequence]
-        }
-    
-    # Simple single path
+def make_constraint(counter, predicate_name, value):
+    counter["constraint"] += 1
+
+    short_value = value
+
     return {
-        'type': 'simple',
-        'path': str(path)
+        "id": f"constraint-{counter['constraint']}",
+        "type": "Constraint",
+        "label": f"{predicate_name.split(':')[-1]} = {short_value}",
+        "properties": {
+            predicate_name: short_value
+        },
+        "children": []
     }
 
+ALWAYS_KEEP_PREFIXES = {"rdf", "rdfs", "sh", "xsd"}
 
-def get_rdf_list(graph, list_node, predicate=None):
-    """
-    Extract an RDF list into a Python list.
-    RDF lists use rdf:first and rdf:rest structure.
-    """
-    
-    # If predicate provided, get the list node first
-    if predicate:
-        list_node = graph.value(list_node, predicate)
-    
-    if not list_node:
-        return []
-    
-    result = []
-    current = list_node
-    
-    # Traverse the RDF list structure (max 10000 iterations to prevent infinite loops)
-    iterations = 0
-    while current and current != RDF.nil and iterations < 10000:
-        # Get the first element
-        first = graph.value(current, RDF.first)
-        if first:
-            result.append(first)
-        
-        # Move to next
-        current = graph.value(current, RDF.rest)
-        iterations += 1
-    
+
+def get_namespaces_from_graph(graph):
+    used_namespace_uris = set()
+
+    def collect_from_term(term):
+        if not isinstance(term, URIRef):
+            return
+
+        iri = str(term)
+
+        if "#" in iri:
+            used_namespace_uris.add(iri.rsplit("#", 1)[0] + "#")
+        elif "/" in iri:
+            used_namespace_uris.add(iri.rsplit("/", 1)[0] + "/")
+
+    for subject, predicate, obj in graph:
+        collect_from_term(subject)
+        collect_from_term(predicate)
+        collect_from_term(obj)
+
+    namespaces = {}
+
+    for prefix, namespace in graph.namespaces():
+        namespace_uri = str(namespace)
+
+        if namespace_uri in used_namespace_uris or prefix in ALWAYS_KEEP_PREFIXES:
+            namespaces[prefix] = namespace_uri
+
+    return namespaces
+
+def parse_shacl(graph):
+    trees = []
+
+    counter = {
+        "shape": 0,
+        "property": 0,
+        "constraint": 0,
+        "logical": 0
+    }
+
+    for shape in graph.subjects(RDF.type, SH.NodeShape):
+        counter["shape"] += 1
+
+        shape_node = {
+            "id": f"shape-{counter['shape']}",
+            "type": "NodeShape",
+            "label": local_name(shape),
+            "properties":{
+                "rdf:about": shorten_uri(graph, shape)
+            },
+            "children": []
+        }
+
+        target_classes = [
+            shorten_uri(graph, target)
+            for target in graph.objects(shape, SH.targetClass)
+        ]
+
+        if len(target_classes) == 1:
+            shape_node["properties"]["sh:targetClass"] = target_classes[0]
+        elif len(target_classes) > 1:
+            shape_node["properties"]["sh:targetClass"] = target_classes
+
+        closed = next(graph.objects(shape, SH.closed), None)
+        if closed is not None:
+            shape_node["properties"]["sh:closed"] = str(closed).lower() == "true"
+
+        ignored_properties = []
+
+        for ignored_list in graph.objects(shape, SH.ignoredProperties):
+            for item in graph.items(ignored_list):
+                ignored_properties.append(shorten_uri(graph, item))
+
+        if ignored_properties:
+            shape_node["properties"]["sh:ignoredProperties"] = ignored_properties
+
+        for prop in graph.objects(shape, SH.property):
+            counter["property"] += 1
+
+            path = next(graph.objects(prop, SH.path), None)
+            path_value = shorten_uri(graph, path) if path else ""
+
+            prop_node = {
+                "id": f"prop-{counter['property']}",
+                "type": "PropertyShape",
+                "label": f"{local_name(path) if path else 'unknown'} property",
+                "properties": {},
+                "children": []
+            }
+
+            if path:
+                prop_node["properties"]["sh:path"] = path_value
+
+            constraint_predicates = [
+                (SH.minCount, "sh:minCount", int),
+                (SH.maxCount, "sh:maxCount", int),
+                (SH.datatype, "sh:datatype", None),
+                (SH["class"], "sh:class", None),
+                (SH.nodeKind, "sh:nodeKind", None),
+                (SH.node, "sh:node", None),
+                (SH.pattern, "sh:pattern", str),
+
+            ]
+
+            for predicate_uri, predicate_name, converter in constraint_predicates:
+                value = next(graph.objects(prop, predicate_uri), None)
+
+                if value is None:
+                    continue
+
+                if converter is int:
+                    parsed_value = int(value)
+                elif converter is str:
+                    parsed_value = str(value)
+                else:
+                    parsed_value = shorten_uri(graph, value)
+
+                prop_node["children"].append(
+                    make_constraint(counter, predicate_name, parsed_value)
+                )
+
+            shape_node["children"].append(prop_node)
+
+        trees.append(shape_node)
+    result = {
+    "namespaces": get_namespaces_from_graph(graph)
+    }
+
+    if len(trees) == 1:
+        result["tree"] = trees[0]
+    else:
+        result["trees"] = trees
+
+    output_path_json.parent.mkdir(parents=True, exist_ok=True)
+
+    with output_path_json.open("w", encoding="utf-8") as f:
+        json.dump(result, f, indent=2, ensure_ascii=False)
+
+    print(f"JSON saved to {output_path_json}")
+
     return result
+    
 
 
-def get_single_value(graph, subject, predicate):
+
+def get_tree_data(data):
+    if isinstance(data, str):
+        data = json.loads(data)
+
+    namespaces = data.get("namespaces", {}) if isinstance(data, dict) else {}
+
+    if isinstance(data, dict) and "tree" in data:
+        return [data["tree"]], namespaces
+
+    if isinstance(data, dict) and "trees" in data:
+        return data["trees"], namespaces
+
+    if isinstance(data, list):
+        return data, {}
+
+    raise ValueError("Expected contract JSON with 'tree' or 'trees'")
+
+def extract_namespace(iri_string):
     """
-    Get a single value for a predicate.
-    Returns None if not found.
+    Extract namespace from an IRI.
+    Handles both # and / separators.
     """
+    
+    if not iri_string or iri_string == "":
+        return None, None
+    
     try:
-        value = graph.value(subject, predicate)
-        return str(value) if value else None
-    except Exception:
-        return None
-
-
-def get_all_values(graph, subject, predicate):
-    """
-    Get all values for a predicate (multiple values possible).
-    Returns a list of strings.
-    """
+        parsed = urlparse(iri_string)
+    except:
+        return None, None
+    
+    # Find the last # or / to determine namespace boundary
+    if '#' in iri_string:
+        namespace = iri_string.rsplit('#', 1)[0] + '#'
+        local_name = iri_string.rsplit('#', 1)[1]
+    else:
+        parts = iri_string.rsplit('/', 1)
+        if len(parts) == 2 and '://' in iri_string:
+            namespace = parts[0] + '/'
+            local_name = parts[1]
+        else:
+            return None, None
+    
+    # Check if it's a standard namespace first
+    if namespace in STANDARD_NAMESPACES:
+        return namespace, STANDARD_NAMESPACES[namespace]
+    
+    # Generate prefix from domain
     try:
-        values = list(graph.objects(subject, predicate))
-        return [str(v) for v in values]
-    except Exception:
-        return []
+        domain = parsed.netloc.split('.')
+        prefix = domain[-2] if len(domain) > 1 else domain[0]  # e.g., "example" from "example.com"
+        return namespace, prefix
+    except:
+        return None, None
 
 
-def parse_shacl_to_json(filepath, output_filepath=None):
-    """
-    Load a SHACL shapes document and extract all shapes to JSON.
-    Works with ANY RDF format (Turtle, RDF/XML, N3, JSON-LD, etc.)
-    Automatically discovers all shapes regardless of namespace.
-    
-    Args:
-        filepath: Path to RDF file (Turtle, RDF/XML, etc.)
-        output_filepath: Optional - write JSON to file
-    
-    Returns:
-        Dictionary with all shapes
-    """
-    
-    # Load the RDF graph
-    graph = Graph()
-    try:
-        # rdflib auto-detects format, but you can specify if needed
-        graph.parse(filepath)
-        print(f"Successfully parsed {filepath}")
-        print(f"Graph contains {len(graph)} triples")
-    except Exception as e:
-        print(f"Error parsing RDF file: {e}")
-        return None
-    
-    # Extract all shapes
-    shapes_data = {
-        'shapes': extract_all_shapes(graph)
+def bind_prefix_namespaces(graph, namespaces):
+    # namespaces is prefix -> namespace URI
+    for prefix, namespace_uri in namespaces.items():
+        graph.bind(prefix, Namespace(namespace_uri), replace=True)
+
+    # force standards
+    for namespace_uri, prefix in STANDARD_NAMESPACES.items():
+        graph.bind(prefix, Namespace(namespace_uri), replace=True)
+
+
+
+
+def expand_prefixes(value, namespaces):
+    if not isinstance(value, str):
+        return value
+
+    if value.startswith(("http://", "https://", "urn:")):
+        return value
+
+    if ":" not in value:
+        return value
+
+    prefix, local = value.split(":", 1)
+
+    namespace_uri = namespaces.get(prefix)
+
+    if namespace_uri:
+        return namespace_uri + local
+
+    return value
+
+
+
+
+
+def _create_rdf_list(graph, items):
+    if not items:
+        return RDF.nil
+
+    current = RDF.nil
+
+    for item in reversed(items):
+        list_node = BNode()
+
+        if isinstance(item, (URIRef, Literal, BNode)):
+            rdf_item = item
+        elif isinstance(item, str):
+            rdf_item = URIRef(item) if item.startswith(("http://", "https://", "urn:")) else Literal(item)
+        else:
+            rdf_item = Literal(item)
+
+        graph.add((list_node, RDF.first, rdf_item))
+        graph.add((list_node, RDF.rest, current))
+
+        current = list_node
+
+    return current
+
+
+SHACL_PREDICATES = {
+    "sh:targetClass": SH.targetClass,
+    "sh:closed": SH.closed,
+    "sh:ignoredProperties": SH.ignoredProperties,
+    "sh:path": SH.path,
+    "sh:minCount": SH.minCount,
+    "sh:maxCount": SH.maxCount,
+    "sh:datatype": SH.datatype,
+    "sh:class": SH["class"],
+    "sh:nodeKind": SH.nodeKind,
+     "sh:node": SH.node,
+    "sh:pattern": SH.pattern,
+}
+
+
+def to_rdf_value(value,namespaces):
+    value = expand_prefixes(value, namespaces)
+
+    if isinstance(value, bool):
+        return Literal(value, datatype=XSD.boolean)
+
+    if isinstance(value, int):
+        return Literal(value, datatype=XSD.integer)
+
+    if isinstance(value, str):
+        if value.startswith(("http://", "https://", "urn:")):
+            return URIRef(value)
+
+        return Literal(value)
+
+    return Literal(value)
+
+def standard_prefix_map():
+    return {
+        prefix: namespace_uri
+        for namespace_uri, prefix in STANDARD_NAMESPACES.items()
     }
-    
-    print(f"Extracted {len(shapes_data['shapes'])} shapes")
-    
-    # Write to file if specified
-    if output_filepath:
-        try:
-            with open(output_filepath, 'w') as f:
-                json.dump(shapes_data, f, indent=2)
-            print(f"Shapes exported to {output_filepath}")
-        except Exception as e:
-            print(f"Error writing to file: {e}")
-    
-    return shapes_data
 
 
-# Usage example
-if __name__ == "__main__":
-    # Replace with your SHACL file path
-    result = parse_shacl_to_json("shapes.ttl", "shapes.json")
-    
-    # Or just print as JSON
-    if result:
-        print("\n" + "="*50)
-        print("EXTRACTED SHAPES (JSON):")
-        print("="*50)
-        print(json.dumps(result, indent=2))
+def parse_json(tree_data, output_filepath):
+    root_nodes, json_namespaces = get_tree_data(tree_data)
+
+    graph = Graph()
+    namespaces = {
+        prefix: namespace_uri
+        for namespace_uri, prefix in STANDARD_NAMESPACES.items()
+    }
+    namespaces.update(json_namespaces)
+
+    bind_prefix_namespaces(graph, namespaces)
+
+    print(f"Detected {len(namespaces)} namespaces:")
+    for ns_uri, prefix in namespaces.items():
+        print(f"  {prefix}: {ns_uri}")
+
+    def add_constraint(parent_node, constraint_node):
+        for pred_name, value in constraint_node.get("properties", {}).items():
+            pred_uri = SHACL_PREDICATES.get(pred_name)
+
+            if pred_uri is None:
+                continue
+
+            graph.add((parent_node, pred_uri, to_rdf_value(value,namespaces)))
+
+    def add_property_shape(parent_shape_iri, prop_node):
+        prop_bnode = BNode()
+        graph.add((parent_shape_iri, SH.property, prop_bnode))
+
+        for pred_name, value in prop_node.get("properties", {}).items():
+            pred_uri = SHACL_PREDICATES.get(pred_name)
+
+            if pred_uri is None:
+                continue
+
+            graph.add((prop_bnode, pred_uri, to_rdf_value(value,namespaces)))
+
+        for child in prop_node.get("children", []):
+            if child.get("type") == "Constraint":
+                add_constraint(prop_bnode, child)
+
+            elif child.get("type") == "LogicalOperator":
+                # Not implemented yet
+                pass
+
+        return prop_bnode
+
+    for root in root_nodes:
+        if root.get("type") != "NodeShape":
+            raise ValueError(f"Root node must be NodeShape, got {root.get('type')}")
+
+        shape_ref = root.get("properties", {}).get("rdf:about")
+
+        if shape_ref:
+            shape_iri = URIRef(expand_prefixes(shape_ref,namespaces))
+        else:
+            shape_label = root.get("label") or root.get("id")
+            shape_iri = URIRef(f"http://example.com/ns#{shape_label}")
+
+        graph.add((shape_iri, RDF.type, SH.NodeShape))
+
+        for pred_name, value in root.get("properties", {}).items():
+            pred_uri = SHACL_PREDICATES.get(pred_name)
+
+            if pred_uri is None:
+                continue
+
+            if pred_name == "sh:ignoredProperties":
+                items = [to_rdf_value(item, namespaces) for item in value]
+                ignored_list = _create_rdf_list(graph, items)
+                graph.add((shape_iri, SH.ignoredProperties, ignored_list))
+            else:
+                graph.add((shape_iri, pred_uri, to_rdf_value(value, namespaces)))
+
+        for child in root.get("children", []):
+            if child.get("type") == "PropertyShape":
+                add_property_shape(shape_iri, child)
+
+            elif child.get("type") == "Constraint":
+                add_constraint(shape_iri, child)
+
+            elif child.get("type") == "LogicalOperator":
+                # Not implemented yet
+                pass
+
+    output_path = Path(output_filepath)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    graph.serialize(destination=str(output_path), format="turtle")
+
+    print(f"\nSHACL saved to {output_filepath}")
+
+    return graph
+
+
+
