@@ -1,0 +1,104 @@
+{
+  "namespaces": {
+    "sh": "http://www.w3.org/ns/shacl#",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "ex": "http://example.com/ns#"
+  },
+  "tree": {
+    "id": "shape-1",
+    "type": "NodeShape",
+    "label": "PersonShape",
+    "properties": {
+      "rdf:about": "ex:PersonShape",
+      "sh:targetClass": "ex:Person"
+    },
+    "children": [
+      {
+        "id": "prop-1",
+        "type": "PropertyShape",
+        "label": "name property",
+        "properties": {
+          "sh:path": "ex:name"
+        },
+        "children": [
+          {
+            "id": "constraint-1",
+            "type": "Constraint",
+            "label": "datatype = xsd:string",
+            "properties": {
+              "sh:datatype": "xsd:string"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "prop-2",
+        "type": "PropertyShape",
+        "label": "age property",
+        "properties": {
+          "sh:path": "ex:age"
+        },
+        "children": [
+          {
+            "id": "constraint-2",
+            "type": "Constraint",
+            "label": "minCount = 1",
+            "properties": {
+              "sh:minCount": 1
+            },
+            "children": []
+          },
+          {
+            "id": "constraint-3",
+            "type": "Constraint",
+            "label": "datatype = xsd:integer",
+            "properties": {
+              "sh:datatype": "xsd:integer"
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "prop-3",
+        "type": "PropertyShape",
+        "label": "email property",
+        "properties": {
+          "sh:path": "ex:email"
+        },
+        "children": [
+          {
+            "id": "constraint-4",
+            "type": "Constraint",
+            "label": "minCount = 1",
+            "properties": {
+              "sh:minCount": 1
+            },
+            "children": []
+          },
+          {
+            "id": "constraint-5",
+            "type": "Constraint",
+            "label": "maxCount = 1",
+            "properties": {
+              "sh:maxCount": 1
+            },
+            "children": []
+          },
+          {
+            "id": "constraint-6",
+            "type": "Constraint",
+            "label": "nodeKind = sh:IRI",
+            "properties": {
+              "sh:nodeKind": "sh:IRI"
+            },
+            "children": []
+          }
+        ]
+      }
+    ]
+  }
+}

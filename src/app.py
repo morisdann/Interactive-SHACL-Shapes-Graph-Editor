@@ -28,7 +28,7 @@ def serialize():
     path = f.name
     f.close()
 
-    parse_json(tree, path)
+    parse_json({"tree": tree}, path)
 
     turtle = open(path, "r", encoding="utf-8").read()
     os.unlink(path)
