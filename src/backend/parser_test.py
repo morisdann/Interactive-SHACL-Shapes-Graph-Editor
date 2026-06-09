@@ -3,7 +3,7 @@ from pathlib import Path
 
 from rdflib import Graph
 import json
-from shacl_parser import parse_shacl, parse_json #roundtrip_test
+from backend.shacl_parser import parse_shacl, parse_json 
 
 
 BASE_DIR = Path(__file__).resolve().parent
