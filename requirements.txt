@@ -1,0 +1,5 @@
+rdflib==6.3.2
+rdflib-jsonld==0.6.2
+flask==2.3.0
+flask-cors==4.0.0
+json5==0.9.14
